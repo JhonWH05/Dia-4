@@ -119,7 +119,7 @@
 </head>
 <body>
     <h1>&#10084; Bienvenida Amor &#10084;</h1>
-    <h3>El día de hoy deberás armar este rompecabeza</h3>
+    <h3>El día de hoy deberás armar este rompecabezas</h3>
     <h4>Armarlo es la clave de acceso</h4>
     <h5>💚Disfrutalo💚</h5>
     <div id="puzzle"></div>
@@ -146,6 +146,7 @@
         const message = document.getElementById('message');
         const hiddenMessage = document.getElementById('hidden-message');
         const pieces = Array.from({ length: 16 }, (_, i) => i);
+        let selectedPiece = null;
 
         // Desordena las piezas
         pieces.sort(() => Math.random() - 0.5);
@@ -156,16 +157,13 @@
             piece.classList.add('piece');
             piece.style.backgroundImage = "url('img/img6.jpeg')";
             piece.style.backgroundPosition = `${-(index % 4) * 100}px ${-Math.floor(index / 4) * 100}px`;
-            piece.draggable = true;
             piece.dataset.index = index;
             puzzle.appendChild(piece);
-        });
 
-        let draggedPiece = null;
-
-        document.querySelectorAll('.piece').forEach(piece => {
+            // Agrega los eventos para "arrastrar" (drag) y "hacer clic" (click)
             piece.addEventListener('dragstart', () => {
-                draggedPiece = piece;
+                selectedPiece = piece;
+                piece.style.transform = 'scale(1.1)';
             });
 
             piece.addEventListener('dragover', e => {
@@ -173,14 +171,37 @@
             });
 
             piece.addEventListener('drop', () => {
-                if (draggedPiece) {
+                if (selectedPiece) {
                     const tempIndex = piece.dataset.index;
-                    piece.dataset.index = draggedPiece.dataset.index;
-                    draggedPiece.dataset.index = tempIndex;
+                    piece.dataset.index = selectedPiece.dataset.index;
+                    selectedPiece.dataset.index = tempIndex;
 
                     const tempStyle = piece.style.backgroundPosition;
-                    piece.style.backgroundPosition = draggedPiece.style.backgroundPosition;
-                    draggedPiece.style.backgroundPosition = tempStyle;
+                    piece.style.backgroundPosition = selectedPiece.style.backgroundPosition;
+                    selectedPiece.style.backgroundPosition = tempStyle;
+
+                    selectedPiece.style.transform = 'scale(1)';
+                    selectedPiece = null;
+
+                    checkCompletion();
+                }
+            });
+
+            piece.addEventListener('click', () => {
+                if (selectedPiece === null) {
+                    selectedPiece = piece;
+                    piece.style.transform = 'scale(1.1)';
+                } else {
+                    const tempIndex = piece.dataset.index;
+                    piece.dataset.index = selectedPiece.dataset.index;
+                    selectedPiece.dataset.index = tempIndex;
+
+                    const tempStyle = piece.style.backgroundPosition;
+                    piece.style.backgroundPosition = selectedPiece.style.backgroundPosition;
+                    selectedPiece.style.backgroundPosition = tempStyle;
+
+                    selectedPiece.style.transform = 'scale(1)';
+                    selectedPiece = null;
 
                     checkCompletion();
                 }
@@ -188,25 +209,24 @@
         });
 
         function checkCompletion() {
-    const pieces = document.querySelectorAll('.piece');
-    const isComplete = Array.from(pieces).every((piece, index) => {
-        return parseInt(piece.dataset.index) === index;
-    });
+            const pieces = document.querySelectorAll('.piece');
+            const isComplete = Array.from(pieces).every((piece, index) => {
+                return parseInt(piece.dataset.index) === index;
+            });
 
-    if (isComplete) {
-        // Oculta todo (h1, rompecabezas, y mensaje de felicitaciones)
-        document.querySelector('h1').style.display = 'none'; // Oculta el h1
-        document.querySelector('h3').style.display = 'none'; // Oculta el h1
-        document.querySelector('h4').style.display = 'none'; // Oculta el h1
-        document.querySelector('h5').style.display = 'none'; // Oculta el h1
-        puzzle.style.display = 'none'; // Oculta el rompecabezas
-        message.style.display = 'none'; // Oculta el mensaje de felicitaciones
-        setTimeout(() => {
-            hiddenMessage.style.display = 'block'; // Muestra el mensaje especial
-        }, 300); // Espera un poco antes de mostrar el mensaje especial
-    }
-}
-
+            if (isComplete) {
+                // Oculta todo (h1, rompecabezas, y mensaje de felicitaciones)
+                document.querySelector('h1').style.display = 'none'; // Oculta el h1
+                document.querySelector('h3').style.display = 'none'; // Oculta el h1
+                document.querySelector('h4').style.display = 'none'; // Oculta el h1
+                document.querySelector('h5').style.display = 'none'; // Oculta el h1
+                puzzle.style.display = 'none'; // Oculta el rompecabezas
+                message.style.display = 'none'; // Oculta el mensaje de felicitaciones
+                setTimeout(() => {
+                    hiddenMessage.style.display = 'block'; // Muestra el mensaje especial
+                }, 300); // Espera un poco antes de mostrar el mensaje especial
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
